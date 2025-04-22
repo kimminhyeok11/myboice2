@@ -41,8 +41,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.webm`;
 
   // 차단 체크
-  const senderId = (session.user as { id?: string }).id;
-  if (randomUser.blockedUsers && randomUser.blockedUsers.map(id => id.toString()).includes(senderId)) {
+  const senderId = (session.user as { id?: string }).id!;
+  // 차단된 사용자 ID 문자열 배열 생성
+  const blockedIds: string[] = randomUser.blockedUsers?.map((id: any) => id.toString()) || [];
+  if (blockedIds.includes(senderId)) {
     return res.status(403).json({ error: '차단된 사용자입니다.' });
   }
 
