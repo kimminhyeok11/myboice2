@@ -29,7 +29,7 @@ export default function LoginPage() {
             placeholder="이메일"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
             required
           />
           <input
@@ -37,11 +37,11 @@ export default function LoginPage() {
             placeholder="비밀번호"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
             required
           />
           <button type="submit" className="bg-blue-500 text-white rounded p-2">로그인</button>
-          {error && <div className="text-red-500 text-sm">{error}</div>}
+          {error && <div className="text-red-600 font-semibold text-sm mt-2">{error}</div>}
         </form>
         <div className="mt-4 flex flex-col gap-2">
           <div className="text-xs text-gray-500 mb-2">

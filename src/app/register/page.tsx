@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,8 +20,18 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const res = await axios.post("/api/auth/register", { email, name, password });
-      setSuccess("회원가입이 완료되었습니다. 로그인 해주세요.");
-      setTimeout(() => router.push("/login"), 1500);
+      // 회원가입 성공 시 자동 로그인
+      const loginRes = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      if (loginRes?.error) {
+        setSuccess("회원가입은 완료됐지만 자동 로그인이 실패했습니다. 직접 로그인 해주세요.");
+        setTimeout(() => router.push("/login"), 2000);
+      } else {
+        router.push("/dashboard"); // 원하는 경로로 이동
+      }
     } catch (e: any) {
       setError(e.response?.data?.error || "오류 발생");
     }
@@ -37,7 +48,7 @@ export default function RegisterPage() {
             placeholder="이메일"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
             required
           />
           <input
@@ -45,7 +56,7 @@ export default function RegisterPage() {
             placeholder="이름"
             value={name}
             onChange={e => setName(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
             required
           />
           <input
@@ -53,13 +64,13 @@ export default function RegisterPage() {
             placeholder="비밀번호"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
             required
           />
           <button type="submit" className="bg-blue-500 text-white rounded p-2" disabled={loading}>
             {loading ? "가입 중..." : "회원가입"}
           </button>
-          {error && <div className="text-red-500 text-sm">{error}</div>}
+          {error && <div className="text-red-600 font-semibold text-sm mt-2">{error}</div>}
           {success && <div className="text-green-600 text-sm">{success}</div>}
         </form>
         <div className="mt-4 text-center">
