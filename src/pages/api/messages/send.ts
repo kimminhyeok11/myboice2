@@ -4,8 +4,7 @@ import { authOptions } from '../auth/[...nextauth]';
 import { dbConnect } from '@/lib/db';
 import User from '@/models/User';
 import Message from '@/models/Message';
-import fs from 'fs';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js';
 
 export const config = {
   api: {
@@ -36,8 +35,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const randomUser = allUsers[Math.floor(Math.random() * allUsers.length)];
   // 오디오 파일 저장 (간단하게 서버에 저장)
   const { audio } = await parseForm(req);
-  const audioDir = path.join(process.cwd(), 'public', 'audio');
-  if (!fs.existsSync(audioDir)) fs.mkdirSync(audioDir, { recursive: true });
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.webm`;
 
   // 차단 체크
@@ -48,9 +45,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(403).json({ error: '차단된 사용자입니다.' });
   }
 
-  const filepath = path.join(audioDir, filename);
-  fs.writeFileSync(filepath, audio);
-  const audioUrl = `/audio/${filename}`;
+  // Supabase Storage 클라이언트 생성
+  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+  // 오디오 업로드
+  const { data, error } = await supabase.storage
+    .from('audio')
+    .upload(filename, audio, { contentType: 'audio/webm' });
+  if (error) {
+    return res.status(500).json({ error: '오디오 업로드 실패', detail: error.message });
+  }
+  // public URL 생성
+  const { data: publicUrlData } = supabase.storage.from('audio').getPublicUrl(filename);
+  const audioUrl = publicUrlData.publicUrl;
   // 메시지 DB에 저장
   await Message.create({
     sender: senderId,
