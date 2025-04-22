@@ -57,20 +57,12 @@ export default function RecordPage() {
 
   return (
     <>
-      <nav className="w-full flex items-center justify-between px-6 py-4 border-b">
-        <button
-          onClick={() => window.history.length > 1 ? window.history.back() : window.location.assign("/")}
-          className="text-blue-600 hover:underline"
-        >
-          ← 뒤로가기
-        </button>
-        <button
-          onClick={async () => { await fetch('/api/auth/signout'); window.location.assign('/login'); }}
-          className="text-red-500 hover:underline"
-        >
-          로그아웃
-        </button>
-      </nav>
+      <button
+        onClick={() => window.history.length > 1 ? window.history.back() : window.location.assign("/")}
+        className="text-blue-600 hover:underline mt-6 ml-6"
+      >
+        ← 뒤로가기
+      </button>
       <div className="flex flex-col items-center justify-center min-h-screen">
 
       <h1 className="text-2xl font-bold mb-6">음성 메시지 녹음 및 전송</h1>

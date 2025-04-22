@@ -20,6 +20,12 @@ export default function Home() {
       >
         서비스 소개 보기
       </Link>
+      <Link
+        href="/register"
+        className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded shadow transition"
+      >
+        회원가입
+      </Link>
     </main>
   );
 }

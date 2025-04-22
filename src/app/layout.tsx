@@ -30,9 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* SessionProvider moved to ClientSessionProvider */}
-        <Navbar />
-        <ClientSessionProvider>{children}</ClientSessionProvider>
+        <ClientSessionProvider>
+          <Navbar />
+          {children}
+        </ClientSessionProvider>
       </body>
     </html>
   );
