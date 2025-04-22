@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const audioUrl = `/audio/${filename}`;
   // 메시지 DB에 저장
   await Message.create({
-    sender: session.user.id,
+    sender: (session.user as { id?: string }).id,
     receiver: randomUser._id,
     audioUrl,
     status: 'unread',
