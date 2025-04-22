@@ -17,20 +17,25 @@ const STORY = [
 
 
 export default function TypewriterTV({ start = false }: { start?: boolean }) {
+  const [hydrated, setHydrated] = useState(false);
   const [displayed, setDisplayed] = useState("");
   const [line, setLine] = useState(0);
   const [char, setChar] = useState(0);
   const interval = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!start) return;
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!start || !hydrated) return;
     if (line >= STORY.length) return;
     interval.current = setInterval(() => {
       setDisplayed((prev) => prev + STORY[line][char]);
       setChar((c) => c + 1);
     }, 110);
     return () => clearInterval(interval.current!);
-  }, [line, char, start]);
+  }, [line, char, start, hydrated]);
 
   useEffect(() => {
     if (line < STORY.length && char === STORY[line].length) {

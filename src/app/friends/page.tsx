@@ -9,15 +9,16 @@ export default async function FriendsPage() {
     return <div className="p-8">로그인이 필요합니다.</div>;
   }
   await dbConnect();
-  const user = await User.findOne({ email: session.user.email }).populate("friends");
+  // 최대 4명까지만 표시
+  const users = await User.find({ name: { $ne: session.user.name } }).limit(4);
   return (
     <div className="max-w-xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">내 친구 목록</h1>
+      <h1 className="text-2xl font-bold mb-4">다른 사용자 목록</h1>
       <ul className="list-disc list-inside">
-        {user.friends.length === 0 && <li>친구가 없습니다.</li>}
-        {user.friends.map((friend: any) => (
-          <li key={friend._id} className="mb-2">
-            {friend.name || friend.email}
+        {users.length === 0 && <li>다른 사용자가 없습니다.</li>}
+        {users.map((user: any) => (
+          <li key={user._id} className="mb-2">
+            {user.name}
           </li>
         ))}
       </ul>

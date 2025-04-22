@@ -19,14 +19,14 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "text" },
+        name: { label: "Name", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         await dbConnect();
-        const user = await User.findOne({ email: credentials?.email });
+        const user = await User.findOne({ name: credentials?.name });
         if (user) {
-          return { id: user._id, email: user.email, name: user.name };
+          return { id: user._id, name: user.name };
         }
         return null;
       }

@@ -3,6 +3,44 @@ import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 
+function TextFallbackForm({ setMessage, sending }: { setMessage: (msg: string) => void, sending: boolean }) {
+  const [text, setText] = useState("");
+  const [error, setError] = useState("");
+  const handleSend = async () => {
+    if (!text.trim()) return setError("메시지를 입력하세요.");
+    if (text.length > 100) return setError("100자 이내로 입력하세요.");
+    setError("");
+    try {
+      const res = await axios.post("/api/messages/send-text", { text });
+      setMessage(res.data.message || "메시지 전송 성공!");
+      setText("");
+    } catch (e: any) {
+      setMessage(e.response?.data?.error || "오류 발생");
+    }
+  };
+  return (
+    <div className="flex flex-col items-center gap-2 bg-black p-6 rounded-lg shadow-lg w-full max-w-md">
+      <textarea
+        className="w-full p-2 rounded bg-black text-white border border-gray-700 focus:outline-none focus:border-red-500 resize-none"
+        rows={3}
+        maxLength={100}
+        value={text}
+        onChange={e => setText(e.target.value)}
+        placeholder="텍스트 메시지 입력 (최대 100자)"
+        disabled={sending}
+      />
+      <button
+        className="bg-red-500 text-white px-6 py-2 rounded w-full font-bold hover:bg-red-600 disabled:opacity-60"
+        onClick={handleSend}
+        disabled={sending}
+      >
+        텍스트 메시지 전송
+      </button>
+      {error && <div className="text-red-400 mt-1">{error}</div>}
+    </div>
+  );
+}
+
 export default function RecordPage() {
   const { data: session } = useSession();
   const [recording, setRecording] = useState(false);
@@ -14,19 +52,29 @@ export default function RecordPage() {
 
   const startRecording = async () => {
     setMessage("");
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
-    mediaRecorderRef.current = mediaRecorder;
-    audioChunks.current = [];
-    mediaRecorder.ondataavailable = (e) => {
-      audioChunks.current.push(e.data);
-    };
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(audioChunks.current, { type: "audio/webm" });
-      setAudioUrl(URL.createObjectURL(blob));
-    };
-    mediaRecorder.start();
-    setRecording(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunks.current = [];
+      mediaRecorder.ondataavailable = (e) => {
+        audioChunks.current.push(e.data);
+      };
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunks.current, { type: "audio/webm" });
+        setAudioUrl(URL.createObjectURL(blob));
+      };
+      mediaRecorder.start();
+      setRecording(true);
+    } catch (err: any) {
+      if (err?.name === "NotFoundError") {
+        setMessage("마이크 장치를 찾을 수 없습니다. 마이크 연결 및 권한을 확인해 주세요.");
+      } else if (err?.name === "NotAllowedError") {
+        setMessage("마이크 사용 권한이 거부되었습니다. 브라우저의 마이크 권한을 허용해 주세요.");
+      } else {
+        setMessage("녹음 시작 중 오류가 발생했습니다: " + (err?.message || String(err)));
+      }
+    }
   };
 
   const stopRecording = () => {
@@ -56,15 +104,7 @@ export default function RecordPage() {
   }
 
   return (
-    <>
-      <button
-        onClick={() => window.history.length > 1 ? window.history.back() : window.location.assign("/")}
-        className="text-blue-600 hover:underline mt-6 ml-6"
-      >
-        ← 뒤로가기
-      </button>
-      <div className="flex flex-col items-center justify-center min-h-screen">
-
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-2xl font-bold mb-6">음성 메시지 녹음 및 전송</h1>
       <div className="flex flex-col items-center gap-4">
         {!recording && (
@@ -85,9 +125,11 @@ export default function RecordPage() {
             </button>
           </>
         )}
-        {message && <div className="mt-4 text-blue-700">{message}</div>}
+        {(message.includes('마이크 장치를 찾을 수 없습니다') || message.includes('마이크 사용 권한이 거부되었습니다')) && (
+          <TextFallbackForm setMessage={setMessage} sending={sending} />
+        )}
+        {message && <div className="mt-4 text-red-400">{message}</div>}
       </div>
     </div>
-    </>
   );
 }

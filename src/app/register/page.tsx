@@ -6,7 +6,6 @@ import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,21 +18,21 @@ export default function RegisterPage() {
     setSuccess("");
     setLoading(true);
     try {
-      const res = await axios.post("/api/auth/register", { email, name, password });
+      const res = await axios.post("/api/auth/register", { name, password });
       // 회원가입 성공 시 자동 로그인
       const loginRes = await signIn("credentials", {
-        email,
+        name,
         password,
         redirect: false,
       });
       if (loginRes?.error) {
-        setSuccess("회원가입은 완료됐지만 자동 로그인이 실패했습니다. 직접 로그인 해주세요.");
+        setError(typeof loginRes?.error === 'string' ? loginRes?.error : JSON.stringify(loginRes?.error) || '회원가입 실패');
         setTimeout(() => router.push("/login"), 2000);
       } else {
         router.push("/dashboard"); // 원하는 경로로 이동
       }
     } catch (e: any) {
-      setError(e.response?.data?.error || "오류 발생");
+      setError(typeof e.response?.data?.error === 'string' ? e.response?.data?.error : e.response?.data?.error?.message || '회원가입 중 오류가 발생했습니다.');
     }
     setLoading(false);
   };
@@ -43,14 +42,6 @@ export default function RegisterPage() {
       <div className="bg-white p-8 rounded shadow w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-4">회원가입</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="이메일"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="border p-2 rounded text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
-            required
-          />
           <input
             type="text"
             placeholder="이름"
@@ -70,7 +61,11 @@ export default function RegisterPage() {
           <button type="submit" className="bg-blue-500 text-white rounded p-2" disabled={loading}>
             {loading ? "가입 중..." : "회원가입"}
           </button>
-          {error && <div className="text-red-600 font-semibold text-sm mt-2">{error}</div>}
+          {error && (
+            <div className="text-red-500 text-sm mb-2">
+              {typeof error === 'string' ? error : (error ? JSON.stringify(error) : '알 수 없는 오류가 발생했습니다.')}
+            </div>
+          )}
           {success && <div className="text-green-600 text-sm">{success}</div>}
         </form>
         <div className="mt-4 text-center">

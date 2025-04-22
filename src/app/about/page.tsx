@@ -6,7 +6,7 @@ export default function AboutPage() {
         이 서비스는 <b>음성 메시지</b>를 녹음하여 다른 사용자에게 익명으로 보내고, 받은 메시지를 확인할 수 있는 실험적 플랫폼입니다.<br /><br />
         <span className="font-semibold">메세지를 보내보세요. 누군가 응답할겁니다.</span>
       </p>
-      <div className="mb-6 p-4 bg-yellow-50 rounded border border-yellow-200">
+      <div className="mb-6 p-4 bg-black rounded border border-gray-700 text-gray-200">
         <b>MVP 모델</b>임을 참고해 주세요.<br />
         현재 최소 기능만 제공되고 있으며, 여러분의 피드백을 바탕으로 개선될 예정입니다.
       </div>

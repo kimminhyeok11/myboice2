@@ -30,24 +30,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const session = await getServerSession(req, res, authOptions);
   if (!session?.user) return res.status(401).json({ error: 'Not authenticated' });
   await dbConnect();
-  // 랜덤 회원 찾기 (본인 제외)
-  const allUsers = await User.find({ email: { $ne: session.user.email } });
-  if (allUsers.length === 0) return res.status(400).json({ error: '다른 회원이 없습니다.' });
+  // 랜덤 회원 찾기 (본인 포함)
+  const allUsers = await User.find({});
+  if (allUsers.length === 0) return res.status(400).json({ error: '회원이 없습니다.' });
   const randomUser = allUsers[Math.floor(Math.random() * allUsers.length)];
   // 오디오 파일 저장 (간단하게 서버에 저장)
   const { audio } = await parseForm(req);
   const audioDir = path.join(process.cwd(), 'public', 'audio');
   if (!fs.existsSync(audioDir)) fs.mkdirSync(audioDir, { recursive: true });
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.webm`;
+
+  // 차단 체크
+  const senderId = (session.user as { id?: string }).id;
+  if (randomUser.blockedUsers && randomUser.blockedUsers.map(id => id.toString()).includes(senderId)) {
+    return res.status(403).json({ error: '차단된 사용자입니다.' });
+  }
+
   const filepath = path.join(audioDir, filename);
   fs.writeFileSync(filepath, audio);
   const audioUrl = `/audio/${filename}`;
   // 메시지 DB에 저장
   await Message.create({
-    sender: (session.user as { id?: string }).id,
+    sender: senderId,
     receiver: randomUser._id,
     audioUrl,
+    text: "", // 명시적으로 빈 문자열 저장
     status: 'unread',
   });
-  return res.status(200).json({ message: `${randomUser.name || randomUser.email}님에게 메시지가 전송되었습니다!` });
+  return res.status(200).json({ message: "우주 어딘가의 누군가에게 메시지가 전송되었습니다! 신의 응답이 함께 하길.." });
 }

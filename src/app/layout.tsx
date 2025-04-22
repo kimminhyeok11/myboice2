@@ -20,6 +20,29 @@ export const metadata: Metadata = {
 import ClientSessionProvider from "@/components/ClientSessionProvider";
 import Navbar from "@/components/Navbar";
 
+function StarsFalling() {
+  const stars = Array.from({ length: 120 }).map((_, i) => {
+    const left = Math.random() * 100;
+    const duration = 2 + Math.random() * 3;
+    const delay = Math.random() * 5;
+    const size = 1 + Math.random() * 2;
+    return (
+      <div
+        key={i}
+        className="star"
+        style={{
+          left: `${left}vw`,
+          animationDuration: `${duration}s`,
+          animationDelay: `${delay}s`,
+          width: `${size}px`,
+          height: `${size}px`,
+        }}
+      />
+    );
+  });
+  return <div className="stars-bg">{stars}</div>;
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,13 +50,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable}`} style={{ background: 'black', color: 'var(--foreground)' }}>
+        
         <ClientSessionProvider>
-          <Navbar />
-          {children}
+          <nav style={{ background: 'black' }}>
+            <Navbar />
+          </nav>
+          <main className="flex flex-col items-center justify-center min-h-screen" style={{ background: 'black' }}>
+            {children}
+          </main>
         </ClientSessionProvider>
+        <div className="stars-bg" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999, pointerEvents: 'none' }}>
+          <StarsFalling />
+        </div>
       </body>
     </html>
   );

@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!session?.user) return res.status(401).json({ error: 'Not authenticated' });
   await dbConnect();
 
-  const user = await User.findOne({ email: session.user.email });
+  const user = await User.findOne({ name: session.user.name });
   if (!user) return res.status(404).json({ error: 'User not found' });
 
   const { id } = req.body;
