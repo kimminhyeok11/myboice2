@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import ClientSessionProvider from "@/components/ClientSessionProvider";
+import Navbar from "@/components/Navbar";
 
 export default function RootLayout({
   children,
@@ -30,6 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* SessionProvider moved to ClientSessionProvider */}
+        <Navbar />
         <ClientSessionProvider>{children}</ClientSessionProvider>
       </body>
     </html>
