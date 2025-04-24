@@ -106,7 +106,7 @@ export default function RecordPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center h-screen overflow-hidden p-2">
       <h1 className="text-2xl font-bold mb-6">음성 메시지 녹음 및 전송</h1>
       <div className="flex flex-col items-center gap-4">
         {!recording && (
@@ -131,14 +131,6 @@ export default function RecordPage() {
           <TextFallbackForm setMessage={setMessage} sending={sending} />
         )}
         {message && <div className="mt-4 text-red-400">{message}</div>}
-        {publicAudioUrl && (
-          <div className="mt-4">
-            <p className="text-sm">퍼블릭 오디오 URL:</p>
-            <a href={publicAudioUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline break-all">
-              {publicAudioUrl}
-            </a>
-          </div>
-        )}
       </div>
     </div>
   );
