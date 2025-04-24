@@ -55,7 +55,7 @@ export default function RootLayout({
           <nav className="bg-black">
             <Navbar />
           </nav>
-          <main className="flex flex-col items-center justify-center min-h-screen px-2 py-2">
+          <main className="flex flex-col items-center justify-start h-screen overflow-hidden px-1 py-1">
             {children}
           </main>
         </ClientSessionProvider>

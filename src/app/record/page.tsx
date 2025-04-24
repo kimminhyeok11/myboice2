@@ -106,23 +106,23 @@ export default function RecordPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen overflow-hidden p-2">
-      <h1 className="text-2xl font-bold mb-6">음성 메시지 녹음 및 전송</h1>
-      <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center justify-start h-screen overflow-hidden p-1 pt-1">
+      <h1 className="text-xl font-bold mb-1">음성 메시지 녹음 및 전송</h1>
+      <div className="flex flex-col items-center gap-1">
         {!recording && (
-          <button onClick={startRecording} className="bg-blue-500 text-white px-6 py-2 rounded">
+          <button onClick={startRecording} className="bg-blue-500 text-white px-4 py-1 rounded">
             녹음 시작
           </button>
         )}
         {recording && (
-          <button onClick={stopRecording} className="bg-red-500 text-white px-6 py-2 rounded">
+          <button onClick={stopRecording} className="bg-red-500 text-white px-4 py-1 rounded">
             녹음 중지
           </button>
         )}
         {audioUrl && (
           <>
             <audio controls src={audioUrl} className="mb-2" />
-            <button onClick={sendAudio} disabled={sending} className="bg-green-500 text-white px-6 py-2 rounded">
+            <button onClick={sendAudio} disabled={sending} className="bg-green-500 text-white px-4 py-1 rounded">
               {sending ? "전송 중..." : "메시지 보내기 (랜덤 회원에게)"}
             </button>
           </>

@@ -76,7 +76,7 @@ function ReplyButton({ msg, onReplied }: { msg: VoiceMessage, onReplied: () => v
       formData.append('audio', blob);
       formData.append('receiver', msg.sender._id);
       formData.append('replyTo', msg._id);
-      await axios.post('/api/messages/send', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      await axios.post('/api/messages/send', formData);
       setShow(false);
       setAudioChunks([]);
       setAudioUrl(null);
