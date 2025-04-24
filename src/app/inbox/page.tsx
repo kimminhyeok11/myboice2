@@ -260,7 +260,7 @@ const userId = user?.id ?? user?._id;
               <span className={`text-xs ml-2 font-semibold ${msg.status === 'unread' ? 'text-yellow-600' : 'text-green-600'}`}>{msg.status === 'unread' ? '읽지 않음' : '읽음'}</span>
             </div>
             {msg.audioUrl ? (
-              <audio controls src={msg.audioUrl} />
+              <audio controls src={msg.audioUrl} className="w-full" />
             ) : msg.text ? (
               <div className="text-base bg-green-700/70 text-white rounded p-2 whitespace-pre-line">
                 {msg.text ?? ""}
