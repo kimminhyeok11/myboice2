@@ -10,15 +10,13 @@ import fs from 'fs';
 
 export const config = { api: { bodyParser: false } };
 
-function parseForm(req: NextApiRequest): Promise<{ audio: Buffer; originalname: string; mimetype: string; fields: any }> {
+// parse multipart form data
+function parseForm(req: NextApiRequest): Promise<{ fields: any; files: any }> {
   return new Promise((resolve, reject) => {
-    const form = new formidable.IncomingForm();
-    form.parse(req, (err, fields, files) => {
+    const form = formidable({ keepExtensions: true, multiples: false });
+    form.parse(req, (err: any, fields: any, files: any) => {
       if (err) return reject(err);
-      const file = (files.audio as formidable.File) || files.file;
-      if (!file) return reject(new Error('No audio file'));
-      const buffer = fs.readFileSync(file.filepath);
-      resolve({ audio: buffer, originalname: file.originalFilename || file.newFilename || 'recording.webm', mimetype: file.mimetype || 'audio/webm', fields });
+      resolve({ fields, files });
     });
   });
 }
@@ -29,13 +27,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!session?.user) return res.status(401).json({ error: 'Not authenticated' });
   await dbConnect();
 
-  // form parsing (audio + optional receiver, replyTo)
-  let audio, originalname, mimetype, fields;
+  // parse form data to get fields and files
+  let fields: any, files: any;
   try {
-    ({ audio, originalname, mimetype, fields } = await parseForm(req));
+    ({ fields, files } = await parseForm(req));
   } catch (err: any) {
     return res.status(400).json({ error: '오디오 파일 파싱에 실패했습니다.', detail: err.message });
   }
+  // extract audio file
+  const audioField = (files.audio as any);
+  const audioFile: any = Array.isArray(audioField) ? audioField[0] : audioField;
+  if (!audioFile) {
+    return res.status(400).json({ error: '오디오 파일이 업로드되지 않았습니다.' });
+  }
+  const audio = fs.readFileSync(audioFile.filepath);
+  const originalname = audioFile.originalFilename || 'recording.webm';
+  const mimetype = audioFile.mimetype || 'audio/webm';
 
   // 수신자 결정: reply인 경우 fields.receiver 우선, 아니면 랜덤
   let receiverId: string;
