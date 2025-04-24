@@ -18,6 +18,8 @@ export const metadata: Metadata = {
 
 import ClientSessionProvider from "@/components/ClientSessionProvider";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
+import FloatingMenu from "@/components/FloatingMenu";
 
 function StarsFalling() {
   const stars = Array.from({ length: 120 }).map((_, i) => {
@@ -52,12 +54,14 @@ export default function RootLayout({
       <body className={`${notoSansKR.variable} font-sans bg-black text-white`}>
         
         <ClientSessionProvider>
-          <nav className="bg-black">
+          <nav className="hidden md:block bg-black">
             <Navbar />
           </nav>
           <main className="flex flex-col items-center justify-start h-screen overflow-hidden px-1 py-1">
             {children}
           </main>
+          <BottomNav />
+          <FloatingMenu />
         </ClientSessionProvider>
         <div className="stars-bg" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999, pointerEvents: 'none' }}>
           <StarsFalling />
