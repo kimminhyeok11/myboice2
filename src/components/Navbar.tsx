@@ -12,7 +12,7 @@ export default function Navbar() {
 
   // 30초마다 읽지 않은 메시지 개수 폴링
   useEffect(() => {
-    if (!session?.user) return; // 로그인된 경우에만 실행
+    if (!session?.user || pathname === "/inbox") return;
     let mounted = true;
     const fetchUnread = async () => {
       try {
@@ -25,7 +25,7 @@ export default function Navbar() {
     fetchUnread();
     const interval = setInterval(fetchUnread, 30000);
     return () => { mounted = false; clearInterval(interval); };
-  }, [session]);
+  }, [session, pathname]);
 
   // 받은 메시지함에 들어가면 뱃지 0으로 초기화
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function Navbar() {
   }, [pathname]);
 
   return (
-    <nav className="w-full bg-gray-100 py-2 px-2 flex gap-2 sm:gap-4 items-center border-b mb-6 text-xs sm:text-base overflow-x-auto whitespace-nowrap">
+    <nav className="w-full bg-gray-100 py-1 px-2 flex gap-2 items-center border-b mb-2 text-xs sm:text-sm overflow-x-auto whitespace-nowrap">
       <Link href="/" className="font-bold text-blue-600 hover:underline">홈</Link>
       <Link href="/record" className="text-gray-700 hover:underline">메시지 보내기</Link>
       <Link href="/inbox" className="text-gray-700 hover:underline relative">

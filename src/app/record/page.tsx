@@ -45,6 +45,7 @@ export default function RecordPage() {
   const { data: session } = useSession();
   const [recording, setRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [publicAudioUrl, setPublicAudioUrl] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -92,6 +93,7 @@ export default function RecordPage() {
     try {
       const res = await axios.post("/api/messages/send", formData);
       setMessage(res.data.message || "메시지 전송 성공!");
+      setPublicAudioUrl(res.data.audioUrl || null);
       setAudioUrl(null);
     } catch (e: any) {
       setMessage(e.response?.data?.error || "오류 발생");
@@ -129,6 +131,14 @@ export default function RecordPage() {
           <TextFallbackForm setMessage={setMessage} sending={sending} />
         )}
         {message && <div className="mt-4 text-red-400">{message}</div>}
+        {publicAudioUrl && (
+          <div className="mt-4">
+            <p className="text-sm">퍼블릭 오디오 URL:</p>
+            <a href={publicAudioUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline break-all">
+              {publicAudioUrl}
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

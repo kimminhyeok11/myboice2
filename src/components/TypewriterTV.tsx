@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from 'next/image';
 
 const STORY = [
   "...여기는 주피터 탐사대원 1117호, 마지막 생존자.",
@@ -14,7 +15,6 @@ const STORY = [
   "",
   "[신호 종료...]"
 ];
-
 
 export default function TypewriterTV({ start = false }: { start?: boolean }) {
   const [hydrated, setHydrated] = useState(false);
@@ -51,12 +51,15 @@ export default function TypewriterTV({ start = false }: { start?: boolean }) {
   return (
     <div className="relative flex justify-center items-center w-full max-w-md mx-auto" style={{aspectRatio: '4/3', minHeight: 220}}>
       {/* TV 프레임 SVG 이미지 */}
-      <img
+      <Image
         src="/images/tv-frame.svg"
         alt="tv frame"
-        className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-30"
+        fill
+        className="absolute inset-0 object-fill pointer-events-none select-none z-30"
         style={{ opacity: 1 }}
         draggable={false}
+        unoptimized
+        priority
       />
       {/* 글자 박스 */}
       <div
@@ -76,7 +79,7 @@ export default function TypewriterTV({ start = false }: { start?: boolean }) {
           <rect width="100%" height="100%" filter="url(#noiseFilter)" />
         </svg>
         <div
-          className="w-full text-green-400 whitespace-pre text-xs leading-none tracking-wide text-center relative z-40"
+          className="w-full text-green-400 whitespace-pre-wrap break-words overflow-hidden text-xs leading-none tracking-wide text-center relative z-40"
           style={{ minHeight: 80, fontFamily: 'VT323, monospace', fontSize: '13px', lineHeight: '1.05' }}
         >
           {displayed}
